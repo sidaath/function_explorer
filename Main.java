@@ -77,71 +77,56 @@ class Main
 		return list;
 	}
 
-	private static void readTopStatement(Reader reader){
-		StringBuilder charHolder = new StringBuilder();
-		String[] words = new String[2];
-		int r;
-		try{
-			while( (r = reader.read()) != -1){
-				//skip any leading whitespace
-				while((char)r == ' ' || (char)r == '	'){
-					r = reader.read();
-				}
+	private static void skipCommentedLines(BufferedReader reader, char commentStarter){
+                try{
+                    	if(commentStarter == '/'){
+                                char nextChar = (char)reader.read();
+                                if(nextChar == '/'){
+                                        String x = reader.readLine();
+                                        skipCommentedLines(reader, 'x');
+                                        return;
+                                }
+                                if(nextChar == '*'){
+                                        skipCommentedLines(reader, '*');
+                                        return;
+                                }
+                                return;
+                        }
 
-				//check if first letter in file is /, if it is not return
-				if((char)r != '/'){
-					return;
-				}
-				else{
-					r = reader.read();
-				}
-				//check if first two letters are // or /\*, if not return
-				if((char)r != '/' || (char)r != '*'){
-					return;
-				}
-				
-			}
-		}
-		catch(Exception ex){
-			System.out.println("ex 2");
-		}
-	}
+                        if(commentStarter == 'x'){
+                                reader.mark(2);
+                                char nextChar = (char)reader.read();
+                                if(nextChar == '/'){
+                                        skipCommentedLines(reader, '/');
+                                        return;
+                                }else{
+                                      	reader.reset();
+                                        return;
+                                }
+                        }
 
-	private static void skipCommentedLines(Reader reader, char commentStarter){
-		if(commentStarter == '/'){
-			char nextChar = (char)reader.read();
-			if(nextChar == '/'){
-				reader.readLine();
-				skipCommentedLines(reader, 'x');
-				return;
-			}
-			if(nextChar == '*'){
-				skipCommentedLines(reader, '*');
-				return;
-			}
-		}
+                        if(commentStarter == '*'){
+                                String line = reader.readLine();
+                                if(line.length() == 0){
+                                        skipCommentedLines(reader, '*');
+                                        return;
+                                }
+                                String last2Chars = line.substring(line.length() - 2);
+                                if(last2Chars.equals("*/")){
+                                        return;
+                                }else{
+                                      	skipCommentedLines(reader, '*');
+                                        return;
+                                }
+                        }
+                }catch(Exception e){
+                        System.out.println("Exception");
+                        System.out.println(e);
+                }
 
-		if(commentStarter == 'x'){
-			char nextChar = (char)reader.read();
-			if(nextChar == '/'){
-				skipCommentedLines(reader, '/');
-				return;
-			}
-		}
+                return;
+        }
 
-		if(commentStarter == '*'){
-			String line = reader.readLine();
-			String last2Chars = line.substring(line.length() - 2);
-			if(last2Chars.equals("*/")){
-				return;
-			}else{
-				skipCommentedLines(reader, '*');
-				return;
-			}
-		}
-
-		return;
-	}
 
 	private static void readScope(Reader reader, char openBracket, char closeBracket){
 		Deque<Character> stack = new ArrayDeque();

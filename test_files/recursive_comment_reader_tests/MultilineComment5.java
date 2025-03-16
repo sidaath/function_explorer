@@ -1,0 +1,4 @@
+/* kasjhfkajnf * /
+fail
+*/
+pass
