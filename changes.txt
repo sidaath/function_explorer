@@ -1,0 +1,7 @@
+1. Initial - get list of tokens(token = keywords, (), {} -> skip content inside scopes) when given a reader that points to first character of first method
+2. Add comment skipping - read commented out lines/multi line comments recursively and return when first non-commented character is found
+3. Tokenize file - but class keyword and name of class added to list of tokens
+
+TODO:
+1. Tokenize by class - one list per class so that if 2 classes defined in one file, two lists are returned.
+probably split the reading logic to new file and call that recursively

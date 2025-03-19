@@ -10,15 +10,13 @@ class Main
 {
 	public static void main (String[] args){
 		//extend later to get a full queue of directories to search
-		int offset = Integer.parseInt(args[1]);
-		System.out.println("offset = "+offset);
-
 		try{
 			String fileContent = Files.readString(Path.of(args[0]));
 			System.out.println(fileContent);
-			System.out.println("\n\n");
+			System.out.println("**** end of file *******\n");
 			File file = new File(args[0]);
 			ArrayList<String> res = tokenize(file);
+			System.out.println("done tokenizing");
 			int index = 0;
 			for(String s : res){
 				System.out.println(index+" = "+s);
@@ -28,22 +26,23 @@ class Main
 		catch(Exception ex){
 			System.out.println("exception at read 1");
 		}
-		//String content = readBracketContent()
 		System.out.println("done");
 	}
 
 	private static ArrayList<String> tokenize(File file){
 		ArrayList<String> list = new ArrayList();
-
+		boolean inClass = false;
 		try{
 			InputStream inStream = new FileInputStream(file);
-			Reader reader = new InputStreamReader(inStream);
-			Reader buffered = new BufferedReader(reader);
+			Reader readerRaw = new InputStreamReader(inStream);
+			BufferedReader reader = new BufferedReader(readerRaw);
 			int r ;
 			StringBuilder charHolder = new StringBuilder();
-			readTopStatement(reader);
 			while( (r = reader.read()) != -1){
-				if((char)r == ' ' || (char)r == '	'){
+				if((char)r == '/'){
+					skipCommentedLines(reader, (char)r);
+				}
+				else if((char)r == ' ' || (char)r == '	'){
 					if(charHolder.length() > 0){
 						list.add(charHolder.toString());
 						charHolder.setLength(0);
@@ -56,6 +55,9 @@ class Main
 					}
 					readScope(reader, '(', ')');
 					list.add("()");
+				}
+				else if ((char)r == '{' && !inClass){
+					inClass = true;
 				}
 				else if((char)r == '{'){
 					if(charHolder.length() > 0){
@@ -78,7 +80,7 @@ class Main
 	}
 
 	private static void skipCommentedLines(BufferedReader reader, char commentStarter){
-                try{
+		try{
                     	if(commentStarter == '/'){
                                 char nextChar = (char)reader.read();
                                 if(nextChar == '/'){
@@ -119,6 +121,7 @@ class Main
                                         return;
                                 }
                         }
+			return;
                 }catch(Exception e){
                         System.out.println("Exception");
                         System.out.println(e);
@@ -128,13 +131,12 @@ class Main
         }
 
 
-	private static void readScope(Reader reader, char openBracket, char closeBracket){
+	private static void readScope(BufferedReader reader, char openBracket, char closeBracket){
 		Deque<Character> stack = new ArrayDeque();
 		int r;
 		stack.add(openBracket);
 		try{
-			while(stack.size() != 0){
-				r = reader.read();
+			while(stack.size() != 0 && (r = reader.read()) != -1){
 				if((char)r == closeBracket){
 					stack.removeFirst();
 				}
