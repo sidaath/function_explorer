@@ -109,7 +109,7 @@ class Main
 
                         if(commentStarter == '*'){
                                 String line = reader.readLine();
-                                if(line.length() == 0){
+                                if(line.length() < 2){
                                         skipCommentedLines(reader, '*');
                                         return;
                                 }
