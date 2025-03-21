@@ -23,8 +23,8 @@ class Main
 				index++;
 			}
 		}
-		catch(Exception ex){
-			System.out.println("exception at read 1");
+		catch(Exception e){
+			System.out.println(e);
 		}
 		System.out.println("done");
 	}
@@ -72,8 +72,8 @@ class Main
 				}
 			}
 		}
-		catch(Exception ex){
-			System.out.println("exception");
+		catch(Exception e){
+			System.out.println(e);
 		}
 
 		return list;
@@ -123,7 +123,6 @@ class Main
                         }
 			return;
                 }catch(Exception e){
-                        System.out.println("Exception");
                         System.out.println(e);
                 }
 
@@ -145,7 +144,9 @@ class Main
 				}
 			}
 		}
-		catch(Exception e){System.out.println("ex3");}
+		catch(Exception e){
+			System.out.println(e);
+		}
 	}
 }
 
