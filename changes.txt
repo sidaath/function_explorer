@@ -2,7 +2,7 @@
 2. Add comment skipping - read commented out lines/multi line comments recursively and return when first non-commented character is found
 3. Tokenize file - but class keyword and name of class added to list of tokens
 4. Tokenize file without class/interface keyword added to file, and read through all classes in file - using inClass flag
+5. Move tokenizer method to own class, and move logic of checking whether in class or outside class to seperate method. Return map of lists, key=class value=tokens
 
 TODO:
-1. Tokenize by class - one list per class so that if 2 classes defined in one file, two lists are returned.
-probably split the reading logic to new file and call that recursively
+1. Test current changes, configure tester class 

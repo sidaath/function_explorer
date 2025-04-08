@@ -6,7 +6,7 @@ import java.lang.Integer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-class Main
+class TestMain
 {
 	public static void main (String[] args){
 		//extend later to get a full queue of directories to search
