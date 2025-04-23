@@ -14,6 +14,9 @@ import java.lang.Integer;
 
 class MainClass {
 
+	private int number;
+	private String name;
+
 	public int mainClassMethod1(int a, int b){
 		return a + b;
 	}
@@ -23,7 +26,7 @@ class MainClass {
 		System.out.println("aaaa");
 	}
 
-	public String randomMethodStringReturn(int a, int b)   {
+	public String randomMethodStringReturn(int a, int b) throws Exception {
 		/* multi line coment
 		to include here */
 		int c = a + b;
@@ -37,12 +40,22 @@ class MainClass {
 // comment in class scope
 }
 
+//some more comments
+//some more comments
+//
+//
+ /*
+  *multiline comms
+  multiline comms
+  * //
+  */
+
 class InnerClass {
-	public int innerClassMethod1 (int a, int b){
+	public int innerClassMethod1 (int a, int b) throws Something{
 		return a+b;
 	}
 
-	public String innerClassMethod2 (String a, String b){
+	public String innerClassMethod2 (String a, String b) throws SomethingElse{
 		return a+b;
 	}
 

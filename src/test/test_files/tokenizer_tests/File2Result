@@ -1,0 +1,2 @@
+MainClass/private;int;number;private;String;name;public;int;mainClassMethod1;();{};public;void;mainClassMethod2;();{};public;String;randomMethodStringReturn;();throws;Exception;{};public;void;randomMethodVoid__2_;();{};
+InnerClass/public;int;innerClassMethod1;();throws;Something;{};public;String;innerClassMethod2;();throws;SomethingElse;{};public;boolean;innerClassMethod3;();{};
