@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.ArrayDeque;
 import java.io.*;
-import java.lang.Character;
 
 class Tokenizer {
 
@@ -14,55 +13,76 @@ class Tokenizer {
 	}
 
 	private static Map<String,List<String>> getTokensFromFile(File file){
-
-
-		StringBuilder charHolder = new StringBuilder();
 		Map<String, List<String>> tokenMap = new HashMap();
 		
-		int r;
-		String className = "";
-
 		try{
 			InputStream inputStream = new FileInputStream(file);
 			Reader streamReader = new InputStreamReader(inputStream);
 			BufferedReader reader = new BufferedReader(streamReader);
-			while((r = reader.read()) != -1){
-				char character = (char)r;
-				switch(character){
-					case '/':
-						skipCommentedLines(reader, character);
-						break;
-					case '{':
-						List<String> tokens = processClassText(reader);
-						tokenMap.put(className, tokens);
-						charHolder.setLength(0);
-						break;
-					case ' ':
-						className = charHolder.toString();
-						charHolder.setLength(0);
-						break;
-					case '\n':
-						className = charHolder.toString();
-						charHolder.setLength(0);
-						break;
-					default:
-						charHolder.append(character);
-						break;
-				}
-			}
+			tokenMap = parseText(reader);
 		}catch(Exception e){
 			System.out.println(e);
 		}
 		return tokenMap;
 	}
 
+	//read classes contained in a source file recursively
+	//each recursive iteration tokenizes one class/interface
+	//final return is a joined map of all iterations
+	private static Map<String, List<String>> parseText(BufferedReader reader){
+		Map<String, List<String>> tokensInClass = new HashMap();
+		String className = "";
+		try{
+			int r = reader.read();
+			if(r == -1){
+				return tokensInClass;
+			}
+			else{
+				char character = (char)r;
+				StringBuilder charHolder = new StringBuilder();
+				if(character == '/'){
+					skipCommentedLines(reader, '/');
+				}else{
+					charHolder.append(character);
+				}
+				while ((r = reader.read()) != -1 && (character = (char)r) != '{' ){
+					if(character == ' ' || character == ';' || character =='\n'){
+						className = charHolder.toString();
+						charHolder.setLength(0);
+					}else{
+						charHolder.append((char)r);
+					}
+				}
+				if(r == -1){
+					return tokensInClass;
+				}
+				List<String> tokenList = processClassText(reader);
+				tokensInClass.put(className, tokenList);
+			}
 
+			Map<String, List<String>> nextClassTokens = parseText(reader);
+			if(nextClassTokens.isEmpty()){
+				return tokensInClass;
+			}else{
+				for(Map.Entry<String, List<String>> pair : nextClassTokens.entrySet()){
+					tokensInClass.put(pair.getKey(), pair.getValue());
+				}
+			}
+			return tokensInClass;
+		}catch(Exception e){
+			System.out.println(e);
+		}
+		return null;
+	}
+
+	//reads text inside a class/interface while skipping contents within brackets
+	//returns a list of "tokens" - token = identifiers, (), {}, keywords
 	private static List<String> processClassText(BufferedReader reader){
 		ArrayList<String> tokenList = new ArrayList();
 		StringBuilder charHolder = new StringBuilder();
 		int r;
 		try{
-			while((r = reader.read()) != -1){
+			while((char)(r = reader.read()) != '}'){
 				char character = (char)r;
 				
 				if(character == '/'){
@@ -76,14 +96,6 @@ class Tokenizer {
 					}
 					readScope(reader, '{', '}');
 					tokenList.add("{}");
-				}
-
-				else if(character == '}'){
-					return tokenList;
-				}
-
-				else if(character == '}'){
-					charHolder.setLength(0);
 				}
 
 				else if(character == ' ' || character == '	'){
@@ -106,12 +118,16 @@ class Tokenizer {
 					charHolder.append(character);
 				}
 			}
+			return tokenList;
+
 		}catch(Exception e){
 			System.out.println(e);
 		}
 		return tokenList;
 	}
 	
+	//use the reader to skip over commented lines
+	//at end of execution, position reader at the first non-commented char ready for reading
 	private static void skipCommentedLines(BufferedReader reader, char commentStarter){
 		try{
                     	if(commentStarter == '/'){
@@ -160,12 +176,14 @@ class Tokenizer {
                 return;
         }
 	
+	//position the reader at the closing position of scope declared by '(' or '{'
 	private static void readScope(BufferedReader reader, char openBracket, char closeBracket){
 		Deque<Character> stack = new ArrayDeque();
 		int r;
-		stack.add(openBracket);
+		stack.addFirst (openBracket);
 		try{
-			while(stack.size() != 0 && (r = reader.read()) != -1){
+			while(stack.size() != 0){
+				r = reader.read();
 				if((char)r == closeBracket){
 					stack.removeFirst();
 				}
@@ -178,7 +196,4 @@ class Tokenizer {
 			System.out.println(e);
 		}
 	}
-
-
-	
 }
