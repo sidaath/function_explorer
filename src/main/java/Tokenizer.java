@@ -37,6 +37,11 @@ class Tokenizer {
 			if(r == -1){
 				return tokensInClass;
 			}
+
+			if(r == 10){
+				return parseText(reader);
+			}
+
 			else{
 				char character = (char)r;
 				StringBuilder charHolder = new StringBuilder();
@@ -45,7 +50,7 @@ class Tokenizer {
 				}else{
 					charHolder.append(character);
 				}
-				while ((r = reader.read()) != -1 && (character = (char)r) != '{' ){
+				while ((r = reader.read()) != -1 && (character = (char)r) != '{'){
 					if(character == ' ' || character == ';' || character =='\n'){
 						className = charHolder.toString();
 						charHolder.setLength(0);
@@ -53,9 +58,7 @@ class Tokenizer {
 						charHolder.append((char)r);
 					}
 				}
-				if(r == -1){
-					return tokensInClass;
-				}
+				
 				List<String> tokenList = processClassText(reader);
 				tokensInClass.put(className, tokenList);
 			}
