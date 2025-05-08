@@ -46,7 +46,7 @@ class Tokenizer {
 				char character = (char)r;
 				StringBuilder charHolder = new StringBuilder();
 				if(character == '/'){
-					skipCommentedLines(reader, '/');
+					ClassReader.skipCommentedLines(reader, '/');
 				}else{
 					charHolder.append(character);
 				}
@@ -59,7 +59,7 @@ class Tokenizer {
 					}
 				}
 				
-				List<String> tokenList = processClassText(reader);
+				List<String> tokenList = ClassReader.processClass(reader);
 				tokensInClass.put(className, tokenList);
 			}
 
@@ -78,125 +78,126 @@ class Tokenizer {
 		return null;
 	}
 
-	//reads text inside a class/interface while skipping contents within brackets
-	//returns a list of "tokens" - token = identifiers, (), {}, keywords
-	private static List<String> processClassText(BufferedReader reader){
-		ArrayList<String> tokenList = new ArrayList();
-		StringBuilder charHolder = new StringBuilder();
-		int r;
-		try{
-			while((char)(r = reader.read()) != '}'){
-				char character = (char)r;
-				
-				if(character == '/'){
-					skipCommentedLines(reader, character);
-				}
-
-				else if(character == '{'){
-					if(charHolder.length() > 0){
-						tokenList.add(charHolder.toString());
-						charHolder.setLength(0);
-					}
-					readScope(reader, '{', '}');
-					tokenList.add("{}");
-				}
-
-				else if(character == ' ' || character == '	'){
-					if(charHolder.length() > 0){
-						tokenList.add(charHolder.toString());
-						charHolder.setLength(0);
-					}
-				}
-
-				else if(character == '('){
-					if(charHolder.length() > 0){
-						tokenList.add(charHolder.toString());
-						charHolder.setLength(0);
-					}
-					readScope(reader, '(', ')');
-					tokenList.add("()");
-				}
-
-				else if(character != '\n'){
-					charHolder.append(character);
-				}
-			}
-			return tokenList;
-
-		}catch(Exception e){
-			System.out.println(e);
-		}
-		return tokenList;
-	}
+//	//reads text inside a class/interface while skipping contents within brackets
+//	//returns a list of "tokens" - token = identifiers, (), {}, keywords
+//	private static List<String> processClassText(BufferedReader reader){
+//		ArrayList<String> tokenList = new ArrayList();
+//		StringBuilder charHolder = new StringBuilder();
+//		int r;
+//		try{
+//			while((char)(r = reader.read()) != '}'){
+//				char character = (char)r;
+//				
+//				if(character == '/'){
+//					skipCommentedLines(reader, character);
+//				}
+//
+//				else if(character == '{'){
+//					if(charHolder.length() > 0){
+//						tokenList.add(charHolder.toString());
+//						charHolder.setLength(0);
+//					}
+//					readScope(reader, '{', '}');
+//					tokenList.add("{}");
+//				}
+//
+//				else if(character == ' ' || character == '	'){
+//					if(charHolder.length() > 0){
+//						tokenList.add(charHolder.toString());
+//						charHolder.setLength(0);
+//					}
+//				}
+//
+//				else if(character == '('){
+//					if(charHolder.length() > 0){
+//						tokenList.add(charHolder.toString());
+//						charHolder.setLength(0);
+//					}
+//					readScope(reader, '(', ')');
+//					tokenList.add("()");
+//				}
+//
+//				else if(character != '\n'){
+//					charHolder.append(character);
+//				}
+//			}
+//			return tokenList;
+//
+//		}catch(Exception e){
+//			System.out.println(e);
+//		}
+//		return tokenList;
+//	}
+//	
+//	//use the reader to skip over commented lines
+//	//at end of execution, position reader at the first non-commented char ready for reading
+//	private static void skipCommentedLines(BufferedReader reader, char commentStarter){
+//		try{
+//                    	if(commentStarter == '/'){
+//                                char nextChar = (char)reader.read();
+//                                if(nextChar == '/'){
+//                                        String x = reader.readLine();
+//                                        skipCommentedLines(reader, 'x');
+//                                        return;
+//                                }
+//                                if(nextChar == '*'){
+//                                        skipCommentedLines(reader, '*');
+//                                        return;
+//                                }
+//                                return;
+//                        }
+//
+//                        if(commentStarter == 'x'){
+//                                reader.mark(2);
+//                                char nextChar = (char)reader.read();
+//                                if(nextChar == '/'){
+//                                        skipCommentedLines(reader, '/');
+//                                        return;
+//                                }else{
+//                                      	reader.reset();
+//                                        return;
+//                                }
+//                        }
+//
+//                        if(commentStarter == '*'){
+//                                String line = reader.readLine();
+//                                if(line.length() < 2){
+//                                        skipCommentedLines(reader, '*');
+//                                        return;
+//                                }
+//                                String last2Chars = line.substring(line.length() - 2);
+//                                if(last2Chars.equals("*/")){
+//                                        return;
+//                                }else{
+//                                      	skipCommentedLines(reader, '*');
+//                                        return;
+//                                }
+//                        }
+//                }catch(Exception e){
+//                        System.out.println(e);
+//                }
+//                return;
+//        }
+//	
+//	//position the reader at the closing position of scope declared by '(' or '{'
+//	private static void readScope(BufferedReader reader, char openBracket, char closeBracket){
+//		Deque<Character> stack = new ArrayDeque();
+//		int r;
+//		stack.addFirst (openBracket);
+//		try{
+//			while(stack.size() != 0){
+//				r = reader.read();
+//				if((char)r == closeBracket){
+//					stack.removeFirst();
+//				}
+//				if((char)r == openBracket){
+//					stack.addFirst(openBracket);
+//				}
+//			}
+//		}
+//		catch(Exception e){
+//			System.out.println(e);
+//		}
+//	}
 	
-	//use the reader to skip over commented lines
-	//at end of execution, position reader at the first non-commented char ready for reading
-	private static void skipCommentedLines(BufferedReader reader, char commentStarter){
-		try{
-                    	if(commentStarter == '/'){
-                                char nextChar = (char)reader.read();
-                                if(nextChar == '/'){
-                                        String x = reader.readLine();
-                                        skipCommentedLines(reader, 'x');
-                                        return;
-                                }
-                                if(nextChar == '*'){
-                                        skipCommentedLines(reader, '*');
-                                        return;
-                                }
-                                return;
-                        }
-
-                        if(commentStarter == 'x'){
-                                reader.mark(2);
-                                char nextChar = (char)reader.read();
-                                if(nextChar == '/'){
-                                        skipCommentedLines(reader, '/');
-                                        return;
-                                }else{
-                                      	reader.reset();
-                                        return;
-                                }
-                        }
-
-                        if(commentStarter == '*'){
-                                String line = reader.readLine();
-                                if(line.length() < 2){
-                                        skipCommentedLines(reader, '*');
-                                        return;
-                                }
-                                String last2Chars = line.substring(line.length() - 2);
-                                if(last2Chars.equals("*/")){
-                                        return;
-                                }else{
-                                      	skipCommentedLines(reader, '*');
-                                        return;
-                                }
-                        }
-                }catch(Exception e){
-                        System.out.println(e);
-                }
-                return;
-        }
-	
-	//position the reader at the closing position of scope declared by '(' or '{'
-	private static void readScope(BufferedReader reader, char openBracket, char closeBracket){
-		Deque<Character> stack = new ArrayDeque();
-		int r;
-		stack.addFirst (openBracket);
-		try{
-			while(stack.size() != 0){
-				r = reader.read();
-				if((char)r == closeBracket){
-					stack.removeFirst();
-				}
-				if((char)r == openBracket){
-					stack.addFirst(openBracket);
-				}
-			}
-		}
-		catch(Exception e){
-			System.out.println(e);
-		}
-	}
 }
