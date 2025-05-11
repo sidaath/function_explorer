@@ -3,6 +3,8 @@
 3. Tokenize file - but class keyword and name of class added to list of tokens
 4. Tokenize file without class/interface keyword added to file, and read through all classes in file - using inClass flag
 5. Move tokenizer method to own class, and move logic of checking whether in class or outside class to seperate method. Return map of lists, key=class value=tokens
+6. Seperate logic in Tokenizer class into two classes ClassReader and Tokenizer, and move to tokenize package + redo directory structure
 
 TODO:
-1. Test current changes, configure tester class 
+1. Test ClassReader 
+2. Script for test on commit
