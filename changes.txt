@@ -4,7 +4,9 @@
 4. Tokenize file without class/interface keyword added to file, and read through all classes in file - using inClass flag
 5. Move tokenizer method to own class, and move logic of checking whether in class or outside class to seperate method. Return map of lists, key=class value=tokens
 6. Seperate logic in Tokenizer class into two classes ClassReader and Tokenizer, and move to tokenize package + redo directory structure
+7. New test structure = get .java file in one directory, .result file in another, use ClassReaderTest on the .java directory and compare with related .result file
 
 TODO:
-1. Test ClassReader 
+1. Test ClassReader - cleanup Tester class
 2. Script for test on commit
+3. bug in non-buffered reader - wrong return mark

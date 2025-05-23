@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.io.Reader;
 import java.io.BufferedReader;
 
+//Given a reader pointing to the beginning of the class, tokenize a single class and return a list of tokens
+//Tokens = keywords|identifiers|()|{}
+
 class ClassReader{
 
 	static List<String> processClass(Reader reader){
@@ -28,7 +31,7 @@ class ClassReader{
 					tokenList.add("{}");
 				}
 
-				else if(character == ' ' || character == '	'){
+				else if(character == ' ' || character == '	' || character == ';'){
 					if(charHolder.length() > 0){
 						tokenList.add(charHolder.toString());
 						charHolder.setLength(0);
@@ -59,19 +62,18 @@ class ClassReader{
 
 	//use the reader to skip over commented lines
 	//at end of execution, position reader at the first non-commented char ready for reading
-	static void skipCommentedLines(Reader reader, char commentStarter){
+	static int skipCommentedLines(Reader reader, char commentStarter){
 		if(reader.markSupported()){
-			skipWithResetBuffer(reader, '/');
+			return skipWithResetBuffer(reader, '/');
 		}
-		else{
-			skipWithoutResetBuffer(reader, '/');
+		else{			
+			return skipWithoutResetBuffer(reader, '/');
 		}
-		return;
         }
 
 
 	private static int skipWithResetBuffer(Reader reader, char commentStarter){
-		int count = 0;
+		int count = -1;
 		try{
                     	if(commentStarter == '/'){
                                 char nextChar = (char)reader.read();
@@ -138,12 +140,12 @@ class ClassReader{
 		return charHolder.toString();
 	}
 
-	private static void skipWithoutResetBuffer(Reader unresettableReader, char commentStarter){
-		int skippedChars = 0;
+	private static int skipWithoutResetBuffer(Reader unresettableReader, char commentStarter){
+		int skippedChars = -1;
 		try{
  			BufferedReader reader = new BufferedReader(unresettableReader);
 
-			if(commentStarter == '/'){
+			if(commentStarter == '/' ){
 				reader.mark(2);
                                 char nextChar = (char)reader.read();
                                 skippedChars++;
@@ -152,21 +154,21 @@ class ClassReader{
 					skippedChars = x.length();
                                         skippedChars = skippedChars + skipWithResetBuffer(reader, 'x');
 					unresettableReader.skip(skippedChars);
-                                        return;
+                                        return skippedChars;
                                 }
                                 if(nextChar == '*'){
                                         skippedChars = skippedChars + skipWithResetBuffer(reader, '*');
 					unresettableReader.skip(skippedChars);
-                                        return;
+                                        return skippedChars;
                                 }
 				reader.reset();
-                                return;
+                                return skippedChars;
                 	}
                 }catch(Exception e){
                         System.out.println(e);
                 }
 
-                return;
+                return skippedChars;
 	}
 
 	//position the reader at the closing position of scope declared by '(' or '{'
